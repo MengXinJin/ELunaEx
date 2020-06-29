@@ -40,6 +40,41 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 
+namespace mjTL{
+	
+	struct MNullType;
+
+	struct MEmptyType{};
+	
+	template<class...Args>
+	struct MTypeList;
+
+	template<>
+	struct MTypeList<>{
+		typedef MEmptyType type;
+		typedef MNullType next;
+	};
+
+	template<class T,class... Args>
+	struct MTypeList<T,Args...> : public MTypeList<Args...>
+	{
+		typedef T type;
+		typedef MTypeList<Args...> next;
+	};
+
+	template<class T, int index>
+	struct index_type;
+
+	template<class T,class...Args>
+	struct index_type<MTypeList<T, Args...>, 0>{
+		typedef T type;
+	};
+
+	template<class T, class...Args, int index>
+	struct index_type<MTypeList<T, Args...>, index> : index_type<typename MTypeList<T, Args...>::next, index - 1>{};
+}
+
+
 namespace ELuna{
 	//
 	// 实现Lua函数的回调操作
